@@ -38,7 +38,7 @@
   .input { width:100%; background:#f8fafc; border:1px solid var(--line); color:var(--text); padding:14px 14px; border-radius:12px; font-size:15px; outline:none; transition:all .2s; }
   .input:focus { border-color:var(--accent); background:#fff; box-shadow:0 0 0 3px rgba(167,139,250,.15); }
   
-  /* 버튼 기본 스타일 */
+  /* 버튼 스타일 */
   .btn { width: 100%; background:linear-gradient(135deg, var(--accent), #818cf8); color:#fff; border:none; border-radius:12px; padding:14px 18px; font-weight:700; cursor:pointer; font-size:15px; transition:transform .08s ease, box-shadow .2s; box-shadow:0 8px 20px rgba(167, 139, 250, .3); display: flex; justify-content: center; align-items: center; gap: 8px;}
   .btn:hover { transform:translateY(-2px); box-shadow:0 12px 24px rgba(167, 139, 250, .4); }
   .btn.ghost { background:transparent; border:1px solid var(--line); box-shadow:none; color:var(--text); }
@@ -53,6 +53,7 @@
   .view { display: none; opacity: 0; transition: opacity 0.3s ease; }
   .view.active { display: block; opacity: 1; animation: fadeIn 0.4s ease forwards; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
   .link-banner { margin-top:20px; padding:30px 20px; border:1px dashed var(--accent); border-radius:16px; background:#faf5ff; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; }
   .online-board { background: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
   .online-board h4 { margin: 0 0 12px; font-size: 14px; color: #b45309; display: flex; align-items: center; gap: 6px; }
@@ -90,12 +91,28 @@
 <nav class="nav"><div class="nav-inner"><div class="brand"><span class="dot"></span> Practice Sync</div></div></nav>
 
 <div class="container">
-  <section id="view-create" class="view active">
+  
+  <section id="view-auth" class="view active">
     <div class="hero">
       <div class="speaker-wrap">
         <svg class="speaker" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="100" r="96" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/><circle cx="100" cy="100" r="48" fill="#a78bfa"/></svg>
       </div>
-      <h1>같이 연습할 날짜,<br/>한 번에 정해요</h1>
+      <h1>Practice Sync 시작하기</h1>
+      <p class="lead" id="authDesc">3초 만에 로그인하고 일정을 조율해 보세요.</p>
+    </div>
+    <div class="card" style="max-width: 400px; margin: 0 auto; padding-top: 40px; padding-bottom: 40px;">
+      <button class="btn btn-kakao" id="btnLoginKakao" style="margin-bottom: 14px;">
+        <span style="font-size:18px;">💬</span> 카카오로 시작하기
+      </button>
+      <button class="btn btn-google" id="btnLoginGoogle">
+        <span style="font-size:18px;">🌐</span> Google로 시작하기
+      </button>
+    </div>
+  </section>
+
+  <section id="view-create" class="view">
+    <div class="hero">
+      <h1>새로운 모임 만들기</h1>
       <p class="lead">방을 만들고 링크를 공유해 모두의 일정을 종합하세요.</p>
     </div>
     <div class="card">
@@ -123,21 +140,6 @@
       </div>
       <div class="divider"></div>
       <button class="btn ghost" id="btnHostEnter">방장도 내 일정 입력하기 ›</button>
-    </div>
-  </section>
-
-  <section id="view-join" class="view">
-    <div class="hero">
-      <h1 id="joinRoomName">모임 이름</h1>
-      <p class="lead">3초 만에 로그인하고 내 일정을 안전하게 관리하세요!</p>
-    </div>
-    <div class="card" style="max-width: 400px; margin: 0 auto; padding-top: 40px; padding-bottom: 40px;">
-      <button class="btn btn-kakao" id="btnLoginKakao" style="margin-bottom: 14px;">
-        <span style="font-size:18px;">💬</span> 카카오로 시작하기
-      </button>
-      <button class="btn btn-google" id="btnLoginGoogle">
-        <span style="font-size:18px;">🌐</span> Google로 시작하기
-      </button>
     </div>
   </section>
 
@@ -176,7 +178,7 @@
 
 <script>
 /* =========================================================
-   ⚠️ 수파베이스 설정 (제공해주신 프로젝트 정보 적용)
+   ⚠️ 수파베이스 설정 
    ========================================================= */
 const SUPABASE_URL = "https://hmnaqspyubtceqjwsutb.supabase.co"; 
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtbmFxc3B5dWJ0Y2VxandzdXRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5ODk5NDIsImV4cCI6MjA5NjU2NTk0Mn0.qeQgMwUlVhJkQ4GJUhJ8F65ljHR9WehYBShy-PUeU5U"; 
@@ -191,7 +193,6 @@ function getAvatar(name) { let sum = 0; for(let i=0; i<name.length; i++) sum += 
 function toast(msg){ const el = document.getElementById('toast'); el.textContent = msg; el.style.display = 'block'; clearTimeout(el._t); el._t = setTimeout(()=>el.style.display='none', 2000); }
 function ymd(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
-// 로컬 임시 UID 대신, 수파베이스 로그인 세션을 사용할 상태 객체
 const state = { roomId: null, room: null, myUserId: null, myNickname: '', calCursor: new Date(), form: { schedules:{}, regions:[] }, generatedLink: '' };
 function getRoomIdFromUrl() { return new URLSearchParams(window.location.search).get('room'); }
 function showView(viewId) { document.querySelectorAll('.view').forEach(el => el.classList.remove('active')); document.getElementById(viewId).classList.add('active'); window.scrollTo(0,0); }
@@ -200,7 +201,6 @@ async function dbFetchRoom(id) {
   if(!dbClient) return null;
   const { data, error } = await dbClient.from('rooms').select('*').eq('id', id);
   if(error || !data || data.length === 0) return null;
-  
   const targetRoom = data[0];
   if(typeof targetRoom.participants === 'string') targetRoom.participants = JSON.parse(targetRoom.participants);
   if(!targetRoom.participants) targetRoom.participants = [];
@@ -218,72 +218,61 @@ async function dbSaveRoom(room) {
   state.room = room;
 }
 
-// 🚨 [핵심 업데이트] 소셜 로그인 세션 체크 및 연동 로직
+// 🚨 [가장 중요한 로그인 검사 로직] 시작하자마자 무조건 실행됩니다.
 (async function init() {
-  if(!dbClient || SUPABASE_URL.includes("본인의")) {
-    alert("Supabase URL과 Anon Key를 확인해주세요!");
+  if(!dbClient) return;
+
+  const { data: { session } } = await dbClient.auth.getSession();
+  const rid = getRoomIdFromUrl();
+
+  // 1. 로그인이 안 되어 있다면? -> 무조건 첫 화면(소셜 로그인 창) 띄우기!
+  if (!session) {
+    if (rid) {
+       document.getElementById('authDesc').textContent = "초대받은 모임에 참여하려면 로그인이 필요해요!";
+    }
+    showView('view-auth'); // 카카오/구글 로그인 창 띄우기
     return;
   }
 
-  // 1. 현재 브라우저에 로그인된 세션이 있는지 확인
-  const { data: { session } } = await dbClient.auth.getSession();
-  
-  if (session) {
-    // 세션이 있다면 진짜 UID와 닉네임 확보 (Google: full_name, Kakao: name)
-    state.myUserId = session.user.id;
-    state.myNickname = session.user.user_metadata.name || session.user.user_metadata.full_name || '멤버';
-    document.getElementById('currentUserDisplay').innerHTML = `<b>${state.myNickname}</b>님 로그인됨`;
+  // 2. 로그인이 되어 있다면? -> 유저 정보 저장
+  state.myUserId = session.user.id;
+  state.myNickname = session.user.user_metadata.name || session.user.user_metadata.full_name || '멤버';
+  const displayEl = document.getElementById('currentUserDisplay');
+  if(displayEl) displayEl.innerHTML = `<b>${state.myNickname}</b>님 로그인됨`;
+
+  // 3. 방 번호가 없다면? -> 방 만들기 화면 띄우기!
+  if(!rid) { 
+    showView('view-create'); 
+    return; 
   }
 
-  const rid = getRoomIdFromUrl();
-  // 방 번호가 없으면 방 생성 모드
-  if(!rid) { showView('view-create'); return; }
-
-  // 방 번호가 있으면 해당 방 로드
+  // 4. 방 번호가 있다면? -> 정보 불러와서 일정 입력/결과 창 띄우기!
   const room = await dbFetchRoom(rid);
   if(!room) { alert('방을 찾을 수 없습니다.'); window.location.href = window.location.pathname; return; }
 
   state.roomId = rid; state.room = room;
-  document.getElementById('joinRoomName').textContent = room.name;
 
-  // 로그인 상태에 따른 흐름 제어
-  if (session) {
-    const existingMe = room.participants.find(p => p.userId === state.myUserId);
-    if (existingMe) {
-      // 이미 참여했던 유저 -> 결과창
-      state.form.schedules = existingMe.schedules || {};
-      state.form.regions = existingMe.regions || [];
-      renderResults(); showView('view-result');
-    } else {
-      // 로그인은 했지만, 이 방에 처음 참여하는 유저 -> 일정 입력창
-      if(new Date() > new Date(state.room.deadline)) {
-        alert('마감되었습니다.'); renderResults(); showView('view-result'); return;
-      }
-      initScheduleView(); showView('view-schedule');
-    }
+  const existingMe = room.participants.find(p => p.userId === state.myUserId);
+  if (existingMe) {
+    state.form.schedules = existingMe.schedules || {};
+    state.form.regions = existingMe.regions || [];
+    renderResults(); showView('view-result');
   } else {
-    // 로그인이 안 되어있으면 소셜 로그인 화면 띄우기
-    showView('view-join');
+    if(new Date() > new Date(state.room.deadline)) {
+      alert('마감되었습니다.'); renderResults(); showView('view-result'); return;
+    }
+    initScheduleView(); showView('view-schedule');
   }
 })();
 
-/* =========================================================
-   소셜 로그인 버튼 이벤트
-   ========================================================= */
+// 버튼 이벤트: 카카오 & 구글 로그인 작동
 document.getElementById('btnLoginKakao').onclick = async () => {
-  // 현재 접속중인 방 주소(?room=...)를 유지한 채로 카카오 본사로 이동
   await dbClient.auth.signInWithOAuth({ provider: 'kakao', options: { redirectTo: window.location.href } });
 };
-
 document.getElementById('btnLoginGoogle').onclick = async () => {
-  // 현재 접속중인 방 주소를 유지한 채로 구글 본사로 이동
   await dbClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } });
 };
 
-
-/* =========================================================
-   방 생성 및 공유 로직
-   ========================================================= */
 document.getElementById('btnNextSetup').onclick = () => {
   if(!document.getElementById('roomName').value.trim() || document.getElementById('roomPw').value.length < 4) { toast('모임 이름과 4자리 비밀번호를 입력해 주세요.'); return; }
   showView('view-host-setup');
@@ -313,14 +302,9 @@ document.getElementById('btnCopyLink').onclick = async () => {
 };
 
 document.getElementById('btnHostEnter').onclick = () => {
-  // 방장도 방을 만든 직후, 자신의 초대 링크로 다시 접속하게 하여 로그인 플로우를 정상적으로 밟도록 처리
   window.location.href = state.generatedLink;
 };
 
-
-/* =========================================================
-   일정 입력 및 달력 로직
-   ========================================================= */
 function initScheduleView() {
   const dl = new Date(state.room.deadline);
   document.getElementById('deadlineText').textContent = `${dl.getMonth()+1}월 ${dl.getDate()}일 ${dl.getHours()}시`;
@@ -405,9 +389,6 @@ function buildRegionChips(){
   });
 }
 
-/* =========================================================
-   저장 및 결과 출력
-   ========================================================= */
 document.getElementById('btnSaveSchedule').onclick = async () => {
   const dates = Object.keys(state.form.schedules);
   if(dates.length === 0 || state.form.regions.length === 0){ toast('날짜, 시간, 지역을 모두 선택해 주세요.'); return; }
@@ -445,7 +426,7 @@ function recommend(room){
       const arr = Object.entries(rc).sort((a,b)=>b[1]-a[1]);
       if(arr.length > 0) best = { region: arr[0][0] };
     }
-    if(!best && topRegionEntry) best = { region: topRegionEntry[0]; }
+    if(!best && topRegionEntry) best = { region: topRegionEntry[0] };
     if(!best) return;
     const score = (0.7 * (count/N)) + (0.3 * ((regionCount[best.region]||0)/N));
     candidates.push({ date: d, time: t, region: best.region, pairAvail: count, N, score });
@@ -482,7 +463,7 @@ async function renderResults() {
   });
 }
 
-// 🚨 PWA 서비스 워커 등록 코드
+// PWA 서비스 워커 등록 코드
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
