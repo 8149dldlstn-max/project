@@ -58,20 +58,22 @@
   .mini-share-btn { width: 100%; background: #faf5ff; border: 1px dashed var(--accent); color: var(--accent); font-weight: 700; padding: 12px; border-radius: 12px; cursor: pointer; transition: all 0.2s; margin-bottom: 24px; font-size: 14px; }
   .mini-share-btn:hover { background: #f3e8ff; }
 
-  .view { display: none; opacity: 0; transition: opacity 0.3s ease; }
-  .view.active { display: block; opacity: 1; animation: fadeIn 0.4s ease forwards; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  
-  /* 대시보드 리스트 전용 스타일 */
-  .room-list-item { border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: #fff; transition: transform 0.1s; }
-  .room-list-item:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.04); border-color: var(--accent); }
-  .room-list-item h4 { margin: 0 0 6px 0; font-size: 16px; color: var(--text); }
-  .room-list-item p { margin: 0; font-size: 13px; color: var(--muted); }
-  .btn-sm { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--line); background: #fff; color: var(--text); }
+  /* 로비(홈) 버튼 등 소형 버튼 스타일 */
+  .btn-sm { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--line); background: #fff; color: var(--text); transition: all 0.2s; }
+  .btn-sm:hover { background: #f8fafc; border-color: var(--accent); color: var(--accent); }
   .btn-sm.enter { background: #f8fafc; color: var(--accent); border-color: #e2e8f0; }
   .btn-sm.enter:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
   .btn-sm.del { border: none; background: transparent; color: #ef4444; }
   .btn-sm.del:hover { background: #fef2f2; }
+
+  .view { display: none; opacity: 0; transition: opacity 0.3s ease; }
+  .view.active { display: block; opacity: 1; animation: fadeIn 0.4s ease forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .room-list-item { border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: #fff; transition: transform 0.1s; }
+  .room-list-item:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.04); border-color: var(--accent); }
+  .room-list-item h4 { margin: 0 0 6px 0; font-size: 16px; color: var(--text); }
+  .room-list-item p { margin: 0; font-size: 13px; color: var(--muted); }
 
   .online-board { background: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
   .online-board h4 { margin: 0 0 12px; font-size: 14px; color: #b45309; display: flex; align-items: center; gap: 6px; }
@@ -123,15 +125,17 @@
   </section>
 
   <section id="view-dashboard" class="view">
-    <div class="hero" style="padding-bottom: 10px;">
-      <h1 id="dashboardGreeting">내 모임 목록</h1>
-      <p class="lead">참여 중이거나 생성한 방들을 관리하세요.</p>
+    <div class="hero" style="padding-bottom: 10px; display:flex; justify-content:space-between; align-items:flex-end;">
+      <div style="text-align:left;">
+        <h1 id="dashboardGreeting" style="margin:0; font-size:24px;">내 모임 목록</h1>
+        <p class="lead" style="margin:8px 0 0 0; font-size:14px;">참여 중이거나 생성한 방</p>
+      </div>
+      <button id="btnLogout" class="btn ghost btn-sm" style="width:auto; padding:8px 12px;">로그아웃</button>
     </div>
-    <div style="margin-bottom: 24px;">
+    <div style="margin-bottom: 24px; margin-top: 16px;">
       <button class="btn" id="btnGoCreateRoomDashboard">+ 새로운 모임 만들기</button>
     </div>
-    <div id="myRoomListContainer">
-      </div>
+    <div id="myRoomListContainer"></div>
   </section>
 
   <section id="view-create" class="view">
@@ -169,10 +173,15 @@
   <section id="view-schedule" class="view">
     <div class="card" style="margin-top:32px;">
       <button class="mini-share-btn" id="btnCopyLinkMini">🔗 클릭해서 초대 링크 복사하기</button>
-      <div class="row between" style="margin-bottom: 16px;">
+      
+      <div class="row between" style="margin-bottom: 16px; align-items: center;">
         <h2 style="margin:0;">내 일정 입력</h2>
-        <span class="tag" id="currentUserDisplay" style="background:var(--bg); border:none; margin:0;"></span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="tag" id="currentUserDisplay" style="background:var(--bg); border:none; margin:0;"></span>
+          <button class="btn-sm" onclick="window.location.href=window.location.pathname">🏠 로비로</button>
+        </div>
       </div>
+
       <div id="deadlineBadge" class="deadline-info">마감일: <span id="deadlineText"></span></div>
       <div class="online-board"><h4>🐾 현재 참여 완료한 멤버</h4><div class="members-wrap" id="onlineMembersList"></div></div>
       <h3>가능한 날짜 선택</h3>
@@ -188,7 +197,13 @@
 
   <section id="view-result" class="view">
     <div class="card" style="margin-top:32px;">
-      <div class="row between" style="margin-bottom:24px;"><h2>AI 추천 결과</h2><button class="btn ghost" id="btnGoEdit" style="width:auto; padding:8px 16px;">내 일정 수정하기</button></div>
+      <div class="row between" style="margin-bottom:24px; align-items: center;">
+        <h2 style="margin:0;">AI 추천 결과</h2>
+        <div style="display:flex; gap:8px;">
+          <button class="btn ghost btn-sm" id="btnGoEdit" style="width:auto; padding:8px 16px;">내 일정 수정</button>
+          <button class="btn btn-sm" onclick="window.location.href=window.location.pathname" style="width:auto; padding:8px 16px;">🏠 로비로</button>
+        </div>
+      </div>
       <div id="ranks" class="ranks"></div>
       <div id="resultEmpty" class="deadline-info" style="display:none; background:#f1f5f9; color:#475569;">추천 데이터가 부족합니다.</div>
       <div class="divider" style="margin: 24px 0; border-bottom: 1px solid var(--line);"></div>
@@ -240,11 +255,10 @@ async function dbSaveRoom(room) {
   state.room = room;
 }
 
-// 🚨 핵심 로직: 대시보드 불러오기 (내가 참여/생성한 방)
+// 대시보드 불러오기
 async function renderDashboard() {
-  document.getElementById('dashboardGreeting').textContent = `${state.socialName}님의 모임 목록`;
+  document.getElementById('dashboardGreeting').textContent = `${state.socialName}님의 모임`;
   
-  // 전체 방 목록을 불러온 뒤(보안 해제 상태), 내가 속한 방만 필터링합니다.
   const { data, error } = await dbClient.from('rooms').select('*');
   const container = document.getElementById('myRoomListContainer');
   container.innerHTML = '';
@@ -254,7 +268,6 @@ async function renderDashboard() {
     return;
   }
 
-  // 필터링: 내가 방장이거나, participants 배열 안에 내가 있는 경우
   const myRooms = data.filter(r => {
     let parts = r.participants;
     if(typeof parts === 'string') parts = JSON.parse(parts);
@@ -299,7 +312,7 @@ async function deleteRoom(event, id) {
   if(confirm('정말 이 모임을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.')) {
     await dbClient.from('rooms').delete().eq('id', id);
     toast('모임이 삭제되었습니다.');
-    renderDashboard(); // 대시보드 리로드
+    renderDashboard();
   }
 }
 
@@ -326,7 +339,6 @@ if (dbClient) {
 
     const rid = getRoomIdFromUrl();
     
-    // 🚨 주소에 방 번호가 없으면 이제 '대시보드'로 보냅니다!
     if(!rid) { 
       renderDashboard();
       showView('view-dashboard'); 
@@ -364,13 +376,16 @@ if (dbClient) {
   });
 }
 
+// 🚨 로그아웃 버튼 작동
+document.getElementById('btnLogout').onclick = async () => { 
+  await dbClient.auth.signOut(); 
+  window.location.href = window.location.pathname; 
+};
+
 document.getElementById('btnLoginKakao').onclick = async () => { await dbClient.auth.signInWithOAuth({ provider: 'kakao', options: { redirectTo: window.location.origin + window.location.pathname + window.location.search } }); };
 document.getElementById('btnLoginGoogle').onclick = async () => { await dbClient.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + window.location.pathname + window.location.search } }); };
 
-// 대시보드에서 -> 방 만들기 진입
-document.getElementById('btnGoCreateRoomDashboard').onclick = () => {
-  showView('view-create');
-};
+document.getElementById('btnGoCreateRoomDashboard').onclick = () => { showView('view-create'); };
 
 document.getElementById('btnNextSetup').onclick = () => {
   if(!document.getElementById('roomName').value.trim() || document.getElementById('roomPw').value.length < 4) { toast('모임 이름과 4자리 비밀번호를 입력해 주세요.'); return; }
@@ -386,7 +401,6 @@ document.getElementById('btnCreateRoom').onclick = async () => {
     if(!dStart || !dEnd || !deadline) { toast('모든 값을 입력해주세요.'); return; }
 
     const roomId = Math.random().toString(36).slice(2,8);
-    // 🚨 hostId 에 내 유저아이디 저장 (삭제 권한용)
     const room = { id: roomId, name, password: pw, hostId: state.myUserId, dateStart: dStart, dateEnd: dEnd, deadline, participants: [] };
     
     await dbSaveRoom(room);
